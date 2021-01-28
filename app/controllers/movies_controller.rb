@@ -10,6 +10,12 @@ class MoviesController < ApplicationController
     @movies = Movie.all
     @all_ratings = Movie.all_ratings
     @ratings_to_show = []
+
+    if params[:ratings]
+      checked = params[:ratings].keys
+      @movies = Movie.with_ratings(checked)
+      @ratings_to_show = checked
+    end
   end
 
   def new
