@@ -16,6 +16,14 @@ class MoviesController < ApplicationController
       @movies = Movie.with_ratings(checked)
       @ratings_to_show = checked
     end
+
+    if params[:sort] == 'title'
+      @movies = Movie.order("title")
+      @title_header = 'hilite bg-warning'
+    elsif params[:sort] == 'release_date'
+      @movies = Movie.order("release_date DESC")
+      @date_header = 'hilite bg-warning'
+    end
   end
 
   def new
