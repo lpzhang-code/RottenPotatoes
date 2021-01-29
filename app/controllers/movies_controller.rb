@@ -44,7 +44,7 @@ class MoviesController < ApplicationController
       end
     else
       if session[:ratings]
-        @movies = Movie.where(ratings: @ratings_to_show)
+        @movies = Movie.where(rating: @ratings_to_show)
       else
         @movies = Movie.all
       end
