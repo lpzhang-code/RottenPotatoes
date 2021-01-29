@@ -7,24 +7,51 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
-    @all_ratings = Movie.all_ratings
-    @ratings_to_show = []
-
+    # check for filtering
     if params[:ratings]
-      checked = params[:ratings].keys
-      @movies = Movie.with_ratings(checked)
-      @ratings_to_show = checked
+      session[:ratings] = params[:ratings].keys
     end
 
-    if params[:sort] == 'title'
-      @movies = Movie.order("title")
+    # check for sorting
+    if params[:sort]
+      session[:sort] = params[:sort]
+    end
+
+    # prepare instance variables
+    @all_ratings = Movie.all_ratings
+    
+    if session[:ratings] 
+      @ratings_to_show = session[:ratings]
+    else
+      @ratings_to_show = []
+    end
+    
+    # handle cases: (1) sort by title, (2) sort by release date, (3) no sorting
+    case session[:sort]
+    when 'title'
       @title_header = 'hilite bg-warning'
-    elsif params[:sort] == 'release_date'
-      @movies = Movie.order("release_date DESC")
+      if session[:ratings]
+        @movies = Movie.where(rating: @ratings_to_show).order('title')
+      else
+        @movies = Movie.order('title')
+      end
+    when 'release_date'
       @date_header = 'hilite bg-warning'
+      if session[:ratings]
+        @movies = Movie.where(rating: @ratings_to_show).order('release_date DESC')
+      else
+        @movies = Movie.order('release_date DESC')
+      end
+    else
+      if session[:ratings]
+        @movies = Movie.where(ratings: @ratings_to_show)
+      else
+        @movies = Movie.all
+      end
     end
   end
+
+
 
   def new
     # default: render 'new' template
